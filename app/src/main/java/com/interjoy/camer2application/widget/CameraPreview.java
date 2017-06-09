@@ -60,7 +60,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         if (mHolder.getSurface() == null) {
             // preview surface does not exist
             return;
-            
+
         }
 //        if (mCamera != null) {
 //            mCamera.setDisplayOrientation(90);
