@@ -7,10 +7,10 @@ import android.hardware.Camera;
  * Created by zhangwenwei on 2017/6/9.
  */
 
-public interface ICamerControl {
+public interface ICameraControl {
     Camera getCamera();
 
-    void initCamera(Context context);
+    void initDefaultCameraPara();
 
     boolean canSwitchCamera();
 
@@ -21,5 +21,7 @@ public interface ICamerControl {
     String getCameraPath();
 
     void relaseCamera();
+
+    void setPhotoSize(int width,int height);
 
 }
