@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="FocusImageView">
+        <attr name="start_imageId" format="integer" />
+        <attr name="success_imageId" format="integer" />
+        <attr name="fail_imageId" format="integer" />
+        <attr name="animation_duration" format="integer" />
+    </declare-styleable>
+
+</resources>
