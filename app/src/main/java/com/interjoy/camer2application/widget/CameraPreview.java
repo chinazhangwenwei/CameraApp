@@ -20,6 +20,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private static final String TAG = "CameraPreview";
     private Context context;
 
+
+
     public CameraPreview(Context context, Camera camera) {
         super(context);
         this.context = context;
@@ -64,7 +66,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 //        if (mCamera != null) {
 //            mCamera.setDisplayOrientation(90);
 //        }
-        determineDisplayOrientation();
+        determineDisplayOrientation(Camera.CameraInfo.CAMERA_FACING_BACK);
 
         // stop preview before making changes
         try {
@@ -86,13 +88,15 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         }
     }
 
+
+
     /**
      * Determine the current display orientation and rotate the camera preview
      * accordingly
      */
-    private void determineDisplayOrientation() {
+    private void determineDisplayOrientation(int mCameraId) {
         Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
-        Camera.getCameraInfo(0, cameraInfo);
+        Camera.getCameraInfo(mCameraId, cameraInfo);
 
         int rotation = ((Activity) context).getWindowManager().getDefaultDisplay().getRotation();
         int degrees = 0;
@@ -131,6 +135,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
         Log.i(TAG, "displayOrientation:" + displayOrientation);
     }
+
 
     public boolean checkSupport(String type) {
         // get Camera parameters
