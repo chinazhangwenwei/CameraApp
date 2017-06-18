@@ -1,14 +1,14 @@
 package com.interjoy.camer2application.widget;
 
-import android.app.Activity;
 import android.content.Context;
 import android.hardware.Camera;
 import android.util.Log;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import java.util.List;
+import com.interjoy.camer2application.manager.CameraControl;
+
+import java.io.IOException;
 
 
 /**
@@ -19,7 +19,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private Camera mCamera;
     private static final String TAG = "CameraPreview";
     private Context context;
-
 
 
     public CameraPreview(Context context, Camera camera) {
@@ -41,13 +40,15 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     public void surfaceCreated(SurfaceHolder holder) {
         // The Surface has been created, now tell the camera where to draw the preview.
-//        Log.d(TAG, "surfaceCreated: ");
-//        try {
-//            mCamera.setPreviewDisplay(holder);
-//            mCamera.startPreview();
-//        } catch (IOException e) {
-//            Log.d(TAG, "Error setting camera preview: " + e.getMessage());
-//        }
+        if (mCamera == null) {
+            return;
+        }
+        try {
+            mCamera.setPreviewDisplay(holder);
+            mCamera.startPreview();
+        } catch (IOException e) {
+            Log.d(TAG, "Error setting camera preview: " + e.getMessage());
+        }
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
@@ -58,27 +59,27 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
         // If your preview can change or rotate, take care of those events here.
         // Make sure to stop the preview before resizing or reformatting it.
+        CameraControl.getCameraControl(context).setPreViewSize(w, h);
         Log.d(TAG, "surfaceChanged: ");
         if (mHolder.getSurface() == null) {
             // preview surface does not exist
             return;
         }
-//        if (mCamera != null) {
-//            mCamera.setDisplayOrientation(90);
-//        }
-        determineDisplayOrientation(Camera.CameraInfo.CAMERA_FACING_BACK);
-
-        // stop preview before making changes
         try {
             mCamera.stopPreview();
         } catch (Exception e) {
             // ignore: tried to stop a non-existent preview
         }
+        try {
+            mCamera.setPreviewDisplay(mHolder);
+            mCamera.startPreview();
 
-        // set preview size and make any resize, rotate or
-        // reformatting changes here
+        } catch (Exception e) {
+            Log.d(TAG, "Error starting camera preview: " + e.getMessage());
+        }
+    }
 
-        // start preview with new settings
+    public void startPreView() {
         try {
             mCamera.setPreviewDisplay(mHolder);
             mCamera.startPreview();
@@ -89,62 +90,4 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     }
 
 
-
-    /**
-     * Determine the current display orientation and rotate the camera preview
-     * accordingly
-     */
-    private void determineDisplayOrientation(int mCameraId) {
-        Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
-        Camera.getCameraInfo(mCameraId, cameraInfo);
-
-        int rotation = ((Activity) context).getWindowManager().getDefaultDisplay().getRotation();
-        int degrees = 0;
-
-        switch (rotation) {
-            case Surface.ROTATION_0: {
-                degrees = 0;
-                break;
-            }
-            case Surface.ROTATION_90: {
-                degrees = 90;
-                break;
-            }
-            case Surface.ROTATION_180: {
-                degrees = 180;
-                break;
-            }
-            case Surface.ROTATION_270: {
-                degrees = 270;
-                break;
-            }
-        }
-        int displayOrientation;
-        // Camera direction
-        if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            // Orientation is angle of rotation when facing the camera for
-            // the camera image to match the natural orientation of the device
-            displayOrientation = (cameraInfo.orientation + degrees) % 360;
-            displayOrientation = (360 - displayOrientation) % 360;
-        } else {
-            displayOrientation = (cameraInfo.orientation - degrees + 360) % 360;
-        }
-        Log.d(TAG, "相机: " + cameraInfo.orientation + "___________屏幕" + degrees);
-
-        mCamera.setDisplayOrientation(displayOrientation);
-
-        Log.i(TAG, "displayOrientation:" + displayOrientation);
-    }
-
-
-    public boolean checkSupport(String type) {
-        // get Camera parameters
-        Camera.Parameters params = mCamera.getParameters();
-        List<String> focusModes = params.getSupportedFocusModes();
-        if (focusModes.contains(type)) {
-            // Autofocus mode is supported
-            return true;
-        }
-        return false;
-    }
 }

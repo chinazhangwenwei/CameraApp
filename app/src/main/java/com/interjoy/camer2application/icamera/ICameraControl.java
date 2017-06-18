@@ -1,6 +1,7 @@
 package com.interjoy.camer2application.icamera;
 
 import android.content.Context;
+import android.graphics.Point;
 import android.hardware.Camera;
 
 /**
@@ -8,9 +9,9 @@ import android.hardware.Camera;
  */
 
 public interface ICameraControl {
-    Camera getCamera();
+    Camera getCamera(Context context);
 
-    void initDefaultCameraPara();
+    void initDefaultCameraPara(Context context);
 
     boolean canSwitchCamera();
 
@@ -20,8 +21,10 @@ public interface ICameraControl {
 
     String getCameraPath();
 
-    void relaseCamera();
+    void cameraFocus(Point point, Camera.AutoFocusCallback callback);
 
-    void setPhotoSize(int width,int height);
+    void releaseCamera();
+
+    void setPhotoSize(int width, int height);
 
 }

@@ -1,7 +1,8 @@
 package com.interjoy.camer2application.util;
 
-import android.net.Uri;
+import android.content.Context;
 import android.os.Environment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import java.io.File;
@@ -13,27 +14,30 @@ import java.util.Date;
  */
 
 public class FileUtil {
-    public static final int MEDIA_TYPE_IMAGE = 1;
-    public static final int MEDIA_TYPE_VIDEO = 2;
+      public static final String PICTURE_PATH = "INTERJOY_PICS";
 
-    /** Create a file Uri for saving an image or video */
-    private static Uri getOutputMediaFileUri(int type){
-        return Uri.fromFile(getOutputMediaFile(type));
-    }
-
-    /** Create a File for saving an image or video */
-    public static File getOutputMediaFile(int type){
+    /**
+     * Create a File for saving an image or video
+     */
+    public static File getOutputMediaFile(Context context) {
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
+        File[] files = ContextCompat.getExternalFilesDirs(context,
+                Environment.DIRECTORY_PICTURES);
+        String MyPictureDir = null;
+        if (files.length > 0) {
+            MyPictureDir = files[0].getAbsolutePath();
+        } else {
+            return null;
+        }
+        File mediaStorageDir = new File(
+                MyPictureDir, PICTURE_PATH);
+        return mediaStorageDir;
+    }
 
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "MyCameraApp");
-        // This location works best if you want the created images to be shared
-        // between applications and persist after your app has been uninstalled.
-
-        // Create the storage directory if it does not exist
-        if (! mediaStorageDir.exists()){
-            if (! mediaStorageDir.mkdirs()){
+    public static File getOutPicPath(File mediaStorageDir) {
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
                 Log.d("MyCameraApp", "failed to create directory");
                 return null;
             }
@@ -41,16 +45,8 @@ public class FileUtil {
 
         // Create a media file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File mediaFile;
-        if (type == MEDIA_TYPE_IMAGE){
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "IMG_"+ timeStamp + ".jpg");
-        } else if(type == MEDIA_TYPE_VIDEO) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "VID_"+ timeStamp + ".mp4");
-        } else {
-            return null;
-        }
+        File mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+                "IMG_" + timeStamp + ".jpg");
 
         return mediaFile;
     }
